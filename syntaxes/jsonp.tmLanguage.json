@@ -1,32 +1,196 @@
 {
 	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
 	"name": "JSONP",
+	"scopeName": "source.jsonp",
 	"patterns": [
 		{
-			"include": "#keywords"
-		},
-		{
-			"include": "#strings"
+			"include": "#value"
 		}
 	],
 	"repository": {
-		"keywords": {
-			"patterns": [{
-				"name": "keyword.control.jsonp",
-				"match": "\\b(if|while|for|return)\\b"
-			}]
-		},
-		"strings": {
-			"name": "string.quoted.double.jsonp",
-			"begin": "\"",
-			"end": "\"",
+		"array": {
+			"begin": "\\[",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.array.begin.jsonp"
+				}
+			},
+			"end": "\\]",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.array.end.jsonp"
+				}
+			},
+			"name": "meta.structure.array.jsonp",
 			"patterns": [
 				{
-					"name": "constant.character.escape.jsonp",
-					"match": "\\\\."
+					"include": "#value"
+				},
+				{
+					"match": ",",
+					"name": "punctuation.separator.array.jsonp"
+				},
+				{
+					"match": "[^\\s\\]]",
+					"name": "invalid.illegal.expected-array-separator.jsonp"
+				}
+			]
+		},
+		"comment": {
+			"name": "comment.line.number-sign.jsonp",
+			"match": "#.*$"
+		},
+
+		"constant": {
+			"match": "\\b(?:true|false|null|infinity|\\-infinity|nan)\\b",
+			"name": "constant.language.jsonp"
+		},
+		"number": {
+			"patterns": [
+				{
+					"name": "constant.numeric.binary.jsonp",
+					"match": "0b[01]([01]|_[01])*"
+				},
+				{
+					"name": "constant.numeric.octal.jsonp",
+					"match": "0o[0-7]([0-7]|_[0-7]*)"
+				},
+				{
+					"name": "constant.numeric.hexadecimal.jsonp",
+					"match": "0x[0-9a-fA-F]([0-9a-fA-F]|_[0-9a-fA-F])*"
+				},
+				{
+					"name": "constant.numeric.float.jsonp",
+					"match": "-?(0|([1-9](([0-9]|_[0-9])+)?))(?=[.eE])(\\.([0-9](([0-9]|_[0-9])+)?))?([eE](-?[0-9](([0-9]|_[0-9])+)?))?"
+				},
+				{
+					"name": "constant.numeric.integer.jsonp",
+					"match": "-?(0|([1-9](([0-9]|_[0-9])+)?))"
+				}
+			]
+		},
+
+		"object": {
+			"begin": "\\{",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.dictionary.begin.jsonp"
+				}
+			},
+			"end": "\\}",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.dictionary.end.jsonp"
+				}
+			},
+			"name": "meta.structure.dictionary.jsonp",
+			"patterns": [
+				{ "include": "#property-key" },
+				{ "include": "#comment" },
+				{
+					"begin": ":",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.separator.dictionary.key-value.jsonp"
+						}
+					},
+					"end": "(,)|(?=\\})",
+					"endCaptures": {
+						"1": {
+							"name": "punctuation.separator.dictionary.pair.jsonp"
+						}
+					},
+					"name": "meta.structure.dictionary.value.json[",
+					"patterns": [
+						{ "include": "#value" },
+						{
+							"match": "[^\\s,]",
+							"name": "invalid.illegal.expected-dictionary-separator.jsonp"
+						}
+					]
+				},
+				{
+					"match": "[^\\s\\}]",
+					"name": "invalid.illegal.expected-dictionary-separator.jsonp"
+				}
+			]
+		},
+		"string": {
+			"patterns": [
+			{
+				"name": "string.quoted.single.jsonp",
+				"begin": "'",
+				"end": "'",
+				"patterns": [
+					{ "include": "#string-content" }
+				]
+			},
+			{
+				"name": "string.quoted.double.jsonp",
+				"begin": "\"",
+				"end": "\"",
+				"patterns": [
+					{ "include": "#string-content" }
+				]
+			}]
+		},
+
+		"property-key": {
+			"patterns": [
+			{
+				"name": "support.type.property-name.jsonp",
+				"begin": "'",
+				"end": "'",
+				"patterns": [
+					{ "include": "#string-content" }
+				]
+			},
+			{
+				"name": "support.type.property-name.jsonp",
+				"begin": "\"",
+				"end": "\"",
+				"patterns": [
+					{ "include": "#string-content" }
+				]
+			},
+			{
+				"name": "support.type.property-name.jsonp",
+				"match": "[a-zA-z0-9_-]+"
+			}]
+		},
+		"string-content": {
+			"patterns": [
+				{
+					"match": "\\\\([\"' \\\\/bfnrt]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{6})",
+					"name": "constant.character.escape.json"
+				},
+				{
+					"match": "\\\\.",
+					"name": "invalid.illegal.unrecognized-string-escape.jsonp"
+				}
+			]
+		},
+		"value": {
+			"patterns": [
+				{
+					"include": "#constant"
+				},
+				{
+					"include": "#number"
+				},
+				{
+					"include": "#string"
+				},
+				{
+					"include": "#array"
+				},
+				{
+					"include": "#object"
+				},
+				{
+					"include": "#comments"
 				}
 			]
 		}
-	},
-	"scopeName": "source.jsonp"
+	}
 }
